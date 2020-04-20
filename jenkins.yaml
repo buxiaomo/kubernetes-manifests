@@ -214,7 +214,7 @@ spec:
       serviceAccount: jenkins
       containers:
         - name: jenkins
-          image: buxiaomo/jenkins:2.232
+          image: buxiaomo/jenkins:2.233
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
