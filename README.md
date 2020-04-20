@@ -3,19 +3,19 @@
 ## jenkins
 
 ```
-kubectl apply -n ingress -f jenkins.yaml
+kubectl apply -f jenkins.yaml
 ```
 
 ## metrics-server
 
 ```
-kubectl apply -n ingress -f metrics-server.yaml
+kubectl apply -f metrics-server.yaml
 ```
 
 ## nfs-client
 
 ```
-kubectl apply -n ingress -f nfs-client.yaml
+kubectl apply -f nfs-client.yaml
 ```
 
 ## traefik2.0
