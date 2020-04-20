@@ -72,7 +72,7 @@ metadata:
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: traefik
+  name: traefik-daemonset
   namespace: ingress
   labels:
     app: traefik
