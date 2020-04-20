@@ -166,19 +166,33 @@ metadata:
   name: jenkins
   namespace: jenkins
 spec:
-  type: NodePort
   selector:
     app: jenkins
   ports:
     - name: admin
-      nodePort: 30000
       port: 8080
       targetPort: 8080
       protocol: TCP
     - name: agent
-      nodePort: 32767
       port: 32767
       targetPort: 32767
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1beta1
+metadata:
+  name: jenkins
+  namespace: jenkins
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: jenkins.xiaomo.cool
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: jenkins
+              servicePort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
