@@ -11,5 +11,5 @@ metrics-server:
 	@kubectl apply -f metrics-server.yaml
 
 traefik:
-	@kubectl create ns ingress
+	@kubectl create ns ingress || true
 	@kubectl apply -n ingress -f traefik2.0.yaml 
