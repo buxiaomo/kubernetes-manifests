@@ -1,5 +1,8 @@
 all:
-	@kubectl apply -f jenkins.yaml
+	@make jenkins
+	@make nfs-client
+	@make metrics-server
+	@make traefik
 
 jenkins:
 	@kubectl apply -f jenkins.yaml
