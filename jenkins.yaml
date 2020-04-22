@@ -168,6 +168,7 @@ metadata:
 spec:
   selector:
     app: jenkins
+  type: NodePort
   ports:
     - name: admin
       port: 8080
