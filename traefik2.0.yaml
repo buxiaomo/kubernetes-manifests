@@ -46,20 +46,39 @@ subjects:
 
 ---
 kind: Ingress
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 metadata:
   name: traefik
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
-    - host: traefik.xiaomo.cool
+    - host: traefik.xiaomo.site
       http:
         paths:
           - path: /
             backend:
               serviceName: traefik
               servicePort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+spec:
+  selector:
+    app: traefik
+  type: ClusterIP
+  ports:
+    - name: web
+      port: 80
+      targetPort: 80
+    - name: websecure
+      port: 443
+      targetPort: 443
+    - name: admin
+      port: 8080
+      targetPort: 8080 
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -82,6 +101,11 @@ spec:
       labels:
         app: traefik
     spec:
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
       serviceAccountName: traefik-ingress-controller
       terminationGracePeriodSeconds: 1
       containers:
@@ -115,23 +139,3 @@ spec:
                 - ALL
               add:
                 - NET_BIND_SERVICE
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: traefik
-spec:
-  selector:
-    app: traefik
-  type: ClusterIP
-  ports:
-    - name: web
-      port: 80
-      targetPort: 80
-    - name: websecure
-      port: 443
-      targetPort: 443
-    - name: admin
-      port: 8080
-      targetPort: 8080

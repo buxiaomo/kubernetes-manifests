@@ -1,0 +1,106 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nexus-vol
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: nexus.xiaomo.site
+spec:
+  selector:
+    app: nexus
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+    - name: hub
+      port: 5000
+      targetPort: 5000
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: nexus
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: nexus.xiaomo.site
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: nexus
+              servicePort: 8081
+    - host: hub.xiaomo.site
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: nexus
+              servicePort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus-deployment
+  labels:
+    app: nexus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      containers:
+        - name: nexus
+          image: sonatype/nexus3:3.22.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 8081
+            - name: docker
+              protocol: TCP
+              containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            failureThreshold: 10
+          volumeMounts:
+            - name: nexus-vol
+              mountPath: /nexus-data
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
+            - name: LANG
+              value: "zh_CN.UTF-8"
+      volumes:
+        - name: nexus-vol
+          persistentVolumeClaim:
+            claimName: nexus-vol

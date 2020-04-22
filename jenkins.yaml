@@ -172,13 +172,12 @@ spec:
     - name: admin
       port: 8080
       targetPort: 8080
-      protocol: TCP
     - name: agent
       port: 32767
       targetPort: 32767
 ---
 kind: Ingress
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 metadata:
   name: jenkins
   namespace: jenkins
@@ -186,7 +185,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
-    - host: jenkins.xiaomo.cool
+    - host: jenkins.xiaomo.site
       http:
         paths:
           - path: /
@@ -215,7 +214,7 @@ spec:
       containers:
         - name: jenkins
           image: buxiaomo/jenkins:2.233
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
             - containerPort: 32767
@@ -259,16 +258,6 @@ spec:
               value: "/var/jenkins_home/casc_configs/jenkins.yaml"
             - name: JAVA_OPTS
               value: "-Djenkins.install.runSetupWizard=false"
-          readinessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 15
-            periodSeconds: 20
       volumes:
         - name: jenkins-vol
           persistentVolumeClaim:

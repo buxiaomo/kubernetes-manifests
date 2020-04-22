@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: externaldns
+data:
+  Corefile: |-
+    .:53 {
+      log . {
+        class denial
+      }
+      cache
+      errors
+      loadbalance round_robin
+      whoami
+      health
+      prometheus 0.0.0.0:9153
+      proxy . 8.8.8.8:53
+    }
+    k8s.local {
+      etcd k8s.local {
+        stubzones
+        path /skydns
+        endpoint http://etcd:2379
+        upstream 8.8.8.8:53 8.8.4.4:53
+        debug
+      }
+      errors
+      log
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns
+  namespace: externaldns
+  labels:
+    k8s-app: coredns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: coredns
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      labels:
+        k8s-app: coredns
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: In
+                values:
+                - ''
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      containers:
+      - name: coredns
+        image: coredns/coredns:1.3.0
+        args:
+        - -conf
+        - /etc/coredns/Corefile
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 9153
+          name: metrics
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /etc/coredns
+          name: config-volume
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: Corefile
+            path: Corefile
+          name: coredns
+        name: config-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: coredns
+  name: coredns-tcp
+  namespace: externaldns
+spec:
+  type: LoadBalancer
+  externalIPs:
+  - 172.16.1.2
+  ports:
+  - name: dns-tcp
+    port: 53
+    protocol: TCP
+  - name: metrics
+    port: 9153
+    protocol: TCP
+  selector:
+    k8s-app: coredns
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: coredns
+  name: coredns
+  namespace: externaldns
+spec:
+  type: LoadBalancer
+  externalIPs:
+  - 172.16.1.2
+  ports:
+  - name: dns-udp
+    port: 53
+    protocol: UDP
+  selector:
+    k8s-app: coredns
