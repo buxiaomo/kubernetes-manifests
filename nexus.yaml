@@ -32,8 +32,6 @@ kind: Ingress
 apiVersion: extensions/v1beta1
 metadata:
   name: nexus
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
     - host: nexus.xiaomo.site
