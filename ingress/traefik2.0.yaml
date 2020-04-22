@@ -89,7 +89,7 @@ metadata:
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: traefik-daemonset
+  name: traefik-ds
   labels:
     app: traefik
 spec:
