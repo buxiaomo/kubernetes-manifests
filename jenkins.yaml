@@ -30,8 +30,6 @@ kind: ConfigMap
 metadata:
   name: jenkins
   namespace: jenkins
-  labels:
-    app: jenkins
 data:
   jenkins.yaml: |-
     jenkins:
@@ -50,32 +48,41 @@ data:
           allowAnonymousRead: false
       clouds:
       - kubernetes:
+          containerCap: 10
           containerCapStr: "10"
           jenkinsUrl: "http://jenkins:8080/"
+          maxRequestsPerHost: 32
           maxRequestsPerHostStr: "32"
           name: "kubernetes"
           templates:
           - containers:
-            - args: "cat"
-              command: "/bin/sh -c"
-              image: "daocloud.io/buxiaomo/jnlp-slave:4.0.1-1"
+            - image: "docker:19.03.8-dind"
               livenessProbe:
                 failureThreshold: 0
                 initialDelaySeconds: 0
                 periodSeconds: 0
                 successThreshold: 0
                 timeoutSeconds: 0
-              name: "jnlp-slave"
+              name: "dockerd"
+              privileged: true
+              ttyEnabled: true
+              workingDir: "/home/jenkins/agent"
+            - args: "cat"
+              command: "/bin/sh -c"
+              image: "bitnami/kubectl:1.18.2"
+              livenessProbe:
+                failureThreshold: 0
+                initialDelaySeconds: 0
+                periodSeconds: 0
+                successThreshold: 0
+                timeoutSeconds: 0
+              name: "kubectl"
               ttyEnabled: true
               workingDir: "/home/jenkins/agent"
             hostNetwork: false
             label: "jnlp-slave"
             name: "jnlp-slave"
             namespace: "jenkins"
-            volumes:
-            - hostPathVolume:
-                hostPath: "/var/run/docker.sock"
-                mountPath: "/var/run/docker.sock"
             yamlMergeStrategy: "override"
       crumbIssuer:
         standard:
@@ -148,6 +155,7 @@ data:
       mailer:
         charset: "UTF-8"
         useSsl: false
+        useTls: false
       pollSCM:
         pollingThreadCount: 10
       timestamperConfig:
@@ -258,7 +266,7 @@ spec:
             - name: CASC_JENKINS_CONFIG
               value: "/var/jenkins_home/casc_configs/jenkins.yaml"
             - name: JAVA_OPTS
-              value: "-Djenkins.install.runSetupWizard=false"
+              value: "-Djenkins.install.runSetupWizard=false -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.LAUNCH_DIAGNOSTICS=true"
       volumes:
         - name: jenkins-vol
           persistentVolumeClaim:
@@ -296,6 +304,14 @@ rules:
   - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
   - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
