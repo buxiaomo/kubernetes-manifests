@@ -118,8 +118,9 @@ spec:
             - --entrypoints.web.address=:80
             - --entrypoints.websecure.address=:443
             - --providers.kubernetesingress
-            - --certificatesresolvers.ssl.acme.httpchallenge=true
-            - --certificatesresolvers.ssl.acme.httpchallenge.entrypoint=http
+            - --certificatesResolvers.ssl.acme.email=root@xiaomo.site
+            - --certificatesResolvers.ssl.acme.storage=acme.json
+            - --certificatesResolvers.ssl.acme.httpChallenge.entryPoint=web
           ports:
             - name: web
               containerPort: 80

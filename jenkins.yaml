@@ -195,6 +195,8 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
+  tls:
+    certResolver: ssl
   rules:
     - host: jenkins.xiaomo.site
       http:
