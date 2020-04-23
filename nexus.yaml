@@ -31,11 +31,17 @@ apiVersion: extensions/v1beta1
 metadata:
   name: nexus
   annotations:
+    kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.tls.certresolver: ssl
-    traefik.ingress.kubernetes.io/router.tls.domains.0.main: xiaomo.site
-    traefik.ingress.kubernetes.io/router.tls.domains.0.sans: nexus.xiaomo.site
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
 spec:
+  tls:
+    - hosts:
+      - nexus.xiaomo.site
+      secretName: tls
+    - hosts:
+      - hub.xiaomo.site
+      secretName: tls
   rules:
     - host: nexus.xiaomo.site
       http:

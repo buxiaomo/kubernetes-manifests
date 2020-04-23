@@ -50,8 +50,14 @@ apiVersion: extensions/v1beta1
 metadata:
   name: traefik
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
 spec:
+  tls:
+    - hosts:
+      - traefik.xiaomo.site
+      secretName: tls
   rules:
     - host: traefik.xiaomo.site
       http:
@@ -118,9 +124,6 @@ spec:
             - --entrypoints.web.address=:80
             - --entrypoints.websecure.address=:443
             - --providers.kubernetesingress
-            - --certificatesResolvers.ssl.acme.email=root@xiaomo.site
-            - --certificatesResolvers.ssl.acme.storage=acme.json
-            - --certificatesResolvers.ssl.acme.httpChallenge.entryPoint=web
           ports:
             - name: web
               containerPort: 80

@@ -193,19 +193,22 @@ metadata:
   name: jenkins
   namespace: jenkins
   annotations:
+    kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.tls.certresolver: ssl
-    traefik.ingress.kubernetes.io/router.tls.domains.0.main: xiaomo.site
-    traefik.ingress.kubernetes.io/router.tls.domains.0.sans: jenkins.xiaomo.site
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
 spec:
+  tls:
+    - hosts:
+      - jenkins.xiaomo.site
+      secretName: tls
   rules:
-    - host: jenkins.xiaomo.site
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: jenkins
-              servicePort: 8080
+  - host: jenkins.xiaomo.site
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: jenkins
+          servicePort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
