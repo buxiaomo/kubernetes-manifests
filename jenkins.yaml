@@ -77,17 +77,23 @@ data:
                 successThreshold: 0
                 timeoutSeconds: 0
               name: "kubectl"
+              privileged: true
+              runAsGroup: "0"
+              runAsUser: "0"
               ttyEnabled: true
               workingDir: "/home/jenkins/agent"
             hostNetwork: false
             label: "jnlp-slave"
             name: "jnlp-slave"
             namespace: "jenkins"
+            serviceAccount: "jenkins"
             yamlMergeStrategy: "override"
       crumbIssuer:
         standard:
           excludeClientIPFromCrumb: false
       disableRememberMe: false
+      disabledAdministrativeMonitors:
+      - "hudson.diagnosis.ReverseProxySetupMonitor"
       markupFormatter: "plainText"
       mode: NORMAL
       myViewsTabBar: "standard"
@@ -131,10 +137,9 @@ data:
         allowUnregisteredEnabled: false
         charset: "UTF-8"
         debugMode: false
-        defaultBody: |-
-          $PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
-
-          Check console output at $BUILD_URL to view the results.
+        defaultBody: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:\r\n\r\nCheck\
+          \ console output at $BUILD_URL to view the results."
+        defaultContentType: "text/plain"
         defaultSubject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!"
         maxAttachmentSize: -1
         maxAttachmentSizeMb: 0
@@ -144,14 +149,14 @@ data:
       gitHubConfiguration:
         apiRateLimitChecker: ThrottleForNormalize
       gitHubPluginConfig:
-        hookUrl: "http://127.0.0.1:8082/github-webhook/"
+        hookUrl: "http://jenkins:8080/github-webhook/"
       gitSCM:
         createAccountBasedOnEmail: false
         showEntireCommitSummaryInChanges: false
         useExistingAccountWithSameEmail: false
       location:
         adminAddress: "没有配置邮箱地址 <nobody@nowhere>"
-        url: "http://127.0.0.1:8082/"
+        url: "https://jenkins:8080/"
       mailer:
         charset: "UTF-8"
         useSsl: false
@@ -167,18 +172,16 @@ data:
         installations:
         - home: "git"
           name: "Default"
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: jenkins
   namespace: jenkins
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: jenkins.xiaomo.site
 spec:
   selector:
     app: jenkins
-  type: NodePort
   ports:
     - name: admin
       port: 8080
