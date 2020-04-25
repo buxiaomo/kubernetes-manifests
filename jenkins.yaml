@@ -191,7 +191,7 @@ spec:
       targetPort: 32767
 ---
 kind: Ingress
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 metadata:
   name: jenkins
   namespace: jenkins
