@@ -38,10 +38,10 @@ spec:
   tls:
     - hosts:
       - nexus.xiaomo.site
-      secretName: tls
+      secretName: xiaomo-tls
     - hosts:
       - hub.xiaomo.site
-      secretName: tls
+      secretName: xiaomo-tls
   rules:
     - host: nexus.xiaomo.site
       http:

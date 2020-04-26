@@ -203,7 +203,7 @@ spec:
   tls:
     - hosts:
       - jenkins.xiaomo.site
-      secretName: tls
+      secretName: xiaomo-tls
   rules:
   - host: jenkins.xiaomo.site
     http:

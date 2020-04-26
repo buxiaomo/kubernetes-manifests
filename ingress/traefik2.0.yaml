@@ -57,7 +57,7 @@ spec:
   tls:
     - hosts:
       - traefik.xiaomo.site
-      secretName: tls
+      secretName: xiaomo-tls
   rules:
     - host: traefik.xiaomo.site
       http:
