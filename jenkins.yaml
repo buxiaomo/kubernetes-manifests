@@ -274,7 +274,7 @@ spec:
               mountPath: /var/jenkins_home/casc_configs/jenkins.yaml
               subPath: jenkins.yaml
             - name: kubeconfig
-              mountPath: /root/.kube/config
+              mountPath: /var/jenkins_home/.kube/config
             - name: docker-sock
               mountPath: /var/run/docker.sock
           env:
