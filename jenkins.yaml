@@ -292,7 +292,7 @@ spec:
             claimName: jenkins-vol
         - name: casc-configs
           configMap:
-            defaultMode: 0600
+            defaultMode: 0755
             name: jenkins
         - name: kubeconfig
           hostPath:
