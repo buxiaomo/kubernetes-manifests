@@ -217,7 +217,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jenkins
+  name: jenkins-dm
   namespace: jenkins
   labels:
     app: jenkins
@@ -232,20 +232,20 @@ spec:
         app: jenkins
     spec:
       serviceAccount: jenkins
-      securityContext: 
-        runAsUser: 1000
-        runAsGroup: 1000
       containers:
         - name: jenkins
           image: daocloud.io/buxiaomo/jenkins:2.234
           imagePullPolicy: IfNotPresent
+          securityContext: 
+            runAsUser: 1000
+            runAsGroup: 1000
           ports:
             - name: http
               protocol: TCP
               containerPort: 8080
             - name: agent
               protocol: TCP
-                containerPort: 32767
+              containerPort: 32767
           resources:
             limits:
               cpu: 1000m
