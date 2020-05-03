@@ -56,10 +56,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - traefik.xiaomo.site
-      secretName: xiaomo-tls
+      - traefik.xiaomo.cool
+      secretName: xiaomo-cool-tls
   rules:
-    - host: traefik.xiaomo.site
+    - host: traefik.xiaomo.cool
       http:
         paths:
           - path: /
