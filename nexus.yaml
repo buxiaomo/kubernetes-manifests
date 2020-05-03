@@ -37,20 +37,20 @@ metadata:
 spec:
   tls:
     - hosts:
-      - nexus.xiaomo.site
-      secretName: xiaomo-tls
+      - nexus.xiaomo.cool
+      secretName: xiaomo-cool-tls
     - hosts:
       - hub.xiaomo.site
-      secretName: xiaomo-tls
+      secretName: xiaomo-cool-tls
   rules:
-    - host: nexus.xiaomo.site
+    - host: nexus.xiaomo.cool
       http:
         paths:
           - path: /
             backend:
               serviceName: nexus
               servicePort: 8081
-    - host: hub.xiaomo.site
+    - host: hub.xiaomo.cool
       http:
         paths:
           - path: /

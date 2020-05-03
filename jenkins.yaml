@@ -86,6 +86,7 @@ data:
             label: "jnlp-slave"
             name: "jnlp-slave"
             namespace: "jenkins"
+            nodeSelector: "jnlp-slave=true"
             serviceAccount: "jenkins"
             yamlMergeStrategy: "override"
       crumbIssuer:
@@ -202,10 +203,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - jenkins.xiaomo.site
-      secretName: xiaomo-tls
+      - jenkins.xiaomo.cool
+      secretName: xiaomo-cool-tls
   rules:
-  - host: jenkins.xiaomo.site
+  - host: jenkins.xiaomo.cool
     http:
       paths:
       - path: /
