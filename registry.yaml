@@ -1,0 +1,70 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: registry-vol
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+spec:
+  selector:
+    app: registry
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+  labels:
+    app: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      containers:
+        - name: registry
+          image: registry:2
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 5000
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2000Mi
+            requests:
+              cpu: 1000m
+              memory: 1000Mi
+          volumeMounts:
+            - name: registry-vol
+              mountPath: /var/lib/registry
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
+            - name: LANG
+              value: "zh_CN.UTF-8"
+      volumes:
+        - name: registry-vol
+          persistentVolumeClaim:
+            claimName: registry-vol
