@@ -1,5 +1,16 @@
 # https://docs.traefik.io/routing/providers/kubernetes-ingress/
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+
+---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
@@ -45,32 +56,11 @@ subjects:
     namespace: ingress
 
 ---
-kind: Ingress
-apiVersion: networking.k8s.io/v1beta1
-metadata:
-  name: traefik
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/redirect-entry-point: https
-spec:
-  tls:
-    - hosts:
-      - traefik.xiaomo.cool
-      secretName: xiaomo-cool-tls
-  rules:
-    - host: traefik.xiaomo.cool
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: traefik
-              servicePort: 8080
----
 apiVersion: v1
 kind: Service
 metadata:
   name: traefik
+  namespace: ingress
 spec:
   selector:
     app: traefik
@@ -84,18 +74,21 @@ spec:
       targetPort: 443
     - name: admin
       port: 8080
-      targetPort: 8080 
+      targetPort: 8080
+
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: traefik-ingress-controller
+  namespace: ingress
 
 ---
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: traefik-ds
+  name: traefik
+  namespace: ingress
   labels:
     app: traefik
 spec:
@@ -116,14 +109,18 @@ spec:
       terminationGracePeriodSeconds: 1
       containers:
         - name: traefik
-          image: traefik:v2.2
+          image: traefik:v2.3
           args:
             - --log.level=DEBUG
             - --api
             - --api.insecure
             - --entrypoints.web.address=:80
             - --entrypoints.websecure.address=:443
-            - --providers.kubernetesingress
+            - --providers.kubernetesingress.ingressclass=traefik
+            - --tracing=true
+            - --metrics=true
+            - --accesslog=true
+            - --accesslog.format=json
           ports:
             - name: web
               containerPort: 80
