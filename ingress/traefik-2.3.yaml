@@ -117,7 +117,6 @@ spec:
             - --entrypoints.web.address=:80
             - --entrypoints.websecure.address=:443
             - --providers.kubernetesingress.ingressclass=traefik
-            - --metrics=true
             - --accesslog=true
             - --accesslog.format=json
           ports:
