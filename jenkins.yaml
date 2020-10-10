@@ -217,7 +217,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jenkins-dm
+  name: jenkins
   namespace: jenkins
   labels:
     app: jenkins
