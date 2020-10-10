@@ -190,29 +190,7 @@ spec:
     - name: agent
       port: 32767
       targetPort: 32767
----
-kind: Ingress
-apiVersion: networking.k8s.io/v1beta1
-metadata:
-  name: jenkins
-  namespace: jenkins
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/redirect-entry-point: https
-spec:
-  tls:
-    - hosts:
-      - jenkins.xiaomo.cool
-      secretName: xiaomo-cool-tls
-  rules:
-  - host: jenkins.xiaomo.cool
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: jenkins
-          servicePort: 8080
+
 ---
 apiVersion: apps/v1
 kind: Deployment
