@@ -109,7 +109,7 @@ spec:
       terminationGracePeriodSeconds: 1
       containers:
         - name: traefik
-          image: traefik:v2.3
+          image: traefik:v2.0
           args:
             - --log.level=DEBUG
             - --api
