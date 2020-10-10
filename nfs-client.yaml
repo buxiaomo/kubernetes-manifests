@@ -50,12 +50,12 @@ spec:
             - name: NFS_SERVER
               value: 172.16.1.10
             - name: NFS_PATH
-              value: /mnt/user/kubernetes
+              value: /mnt/user/kubernetes/xiaomo
       volumes:
         - name: nfs-client-root
           nfs:
             server: 172.16.1.10
-            path: /mnt/user/kubernetes
+            path: /mnt/user/kubernetes/xiaomo
 
 # ------ rbac.yaml
 ---
