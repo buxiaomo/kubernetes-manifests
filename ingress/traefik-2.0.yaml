@@ -133,8 +133,8 @@ spec:
               cpu: 2000m
               memory: 1024Mi
             requests:
-              cpu: 1000m
-              memory: 1024Mi
+              cpu: 1m
+              memory: 10Mi
           securityContext:
             capabilities:
               drop:
